@@ -211,11 +211,7 @@ function keyPress(e) {
     var keyCode = e.keyCode || e.which,
         key = String.fromCharCode(keyCode),
         isUp = e.type === 'keyup';
-    if(pressedKey[keyCode]) {
-        if(isUp) pressedKey[keyCode] = false;
-        return;
-    }
-    pressedKey[keyCode] = !isUp;
+    pressedKey[keyCode] = !isUp
     if(keyCode === 32) { // space
         if(!isUp) changeDirections();
         beatClick({
@@ -224,8 +220,10 @@ function keyPress(e) {
         });
         return;
     }
-    if($.isNumeric(parseInt(key))) {
-        render(parseInt(key));
+    var index = parseInt(key);
+    if($.isNumeric(index)) {
+        if(index - 1 === currentIndex) return;
+        render(index);
         return;
     }
     var m;
@@ -296,14 +294,14 @@ function render(index) {
         styleSheetStr;
     if(index <= 0) {
         beatEl.attr('figure', 'start');
-        currentIndex = 0;
+        currentIndex = -1;
         current = figureStart;
         styleSheetStr = 'start';
         //styleSheet.prop('href', './figures/start.css');
         warningsEl.show();
     } else if(index > figures.length) {
         beatEl.attr('figure', 'WIP');
-        currentIndex = -1;
+        currentIndex = -2;
         current = figureWIP;
         styleSheetStr = 'WIP';
         //styleSheet.prop('href', './figures/WIP.css');
