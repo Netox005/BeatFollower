@@ -292,30 +292,35 @@ function doParallax() {
 function render(index) {
     beatWrapperEl.children().remove();
     warningsEl.hide();
-    var styleSheet = beatEl.children('link');
+    var styleSheet = beatEl.children('.beat_stylesheet'),
+        styleSheetStr;
     if(index <= 0) {
         beatEl.attr('figure', 'start');
-        currentIndex = Number.NaN;
+        currentIndex = 0;
         current = figureStart;
-        styleSheet.prop('href', './figures/start.css');
+        styleSheetStr = 'start';
+        //styleSheet.prop('href', './figures/start.css');
         warningsEl.show();
     } else if(index > figures.length) {
         beatEl.attr('figure', 'WIP');
-        currentIndex = Number.NaN;
+        currentIndex = -1;
         current = figureWIP;
-        styleSheet.prop('href', './figures/WIP.css');
+        styleSheetStr = 'WIP';
+        //styleSheet.prop('href', './figures/WIP.css');
     } else {
         beatEl.attr('figure', index);
         index--;
         currentIndex = index;
         current = figures[index];
 
-        styleSheet.prop('href', './figures/' + (index + 1) + '.css');
+        styleSheetStr = index + 1;
+        //styleSheet.prop('href', './figures/' + (index + 1) + '.css');
     }
     beatWrapperEl.prop('style', '');
     var currentIndex1 = currentIndex;
-    styleSheet.load(function() {
+    $.get('./figures/' + styleSheetStr + '.css', function(css) {
         if(currentIndex !== currentIndex1) return;
+        styleSheet.text(css);
         beatWrapperEl.append(current.html);
         doGeneralColoring();
     });
