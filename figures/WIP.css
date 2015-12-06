@@ -1,0 +1,11 @@
+[figure="WIP"] .beat_wrapper {
+    width: 100%;
+    text-align: center;
+    cursor: default !important;
+}
+[figure="WIP"] .beat_wrapper .text {
+    font-size: 13vmin;
+    font-weight: 700;
+    font-family: "Verdana", Arial, sans-serif;
+    white-space: nowrap;
+}

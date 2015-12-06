@@ -1,0 +1,16 @@
+[figure="3"] .line.horizontal {
+    width: 60vmin;
+    height: 10px;
+}
+[figure="3"] .line.vertical {
+    width: 10px;
+    height: 60vmin;
+}
+[figure="3"] .circles {
+    width: 60vmin;
+    height: 60vmin;
+}
+[figure="3"] .circles .circle {
+    border: 1.5vmin solid;
+    border-radius: 50%;
+}

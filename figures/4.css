@@ -1,0 +1,17 @@
+[figure="4"] .beat_wrapper .eye {
+    width: 10vmin;
+    height: 10vmin;
+    border-radius: 50%;
+}
+[figure="4"] .beat_wrapper .pupil {
+    width: 3vmin;
+    height: 3vmin;
+    transform: translate(-50%, 0) !important;
+    border-radius: 50%;
+}
+
+[figure="4"] .beat_wrapper .triangle {
+    border-bottom: 25vmin solid transparent;
+    border-left: 12.5vmin solid transparent;
+    border-right: 12.5vmin solid transparent;
+}

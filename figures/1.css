@@ -1,0 +1,41 @@
+[figure="1"] .circle {
+    position: relative;
+    width: 65vmin;
+    height: 65vmin;
+    border-radius: 50%;
+    border: 25px solid transparent;
+}
+[figure="1"] .circle::after {
+    content: "";
+    position: absolute;
+    width: inherit;
+    height: inherit;
+    border-radius: inherit;
+    background-color: inherit;
+    z-index: 1;
+}
+[figure="1"] .line {
+    position: absolute;
+    width: calc(65vmin + 200px);
+    height: 10px;
+}
+[figure="1"] .inner-line {
+    width: calc(65vmin / 4 + 100px);
+    height: inherit;
+    position: absolute;
+    background-color: inherit;
+}
+[figure="1"] .inner-line.left {
+    transform-origin: right;
+    left: 0;
+}
+[figure="1"] .inner-line.right {
+    transform-origin: left;
+    right: 0;
+}
+[figure="1"] .inner-line.up {
+    transform: rotate(10deg);
+}
+[figure="1"] .inner-line.down {
+    transform: rotate(-10deg);
+}

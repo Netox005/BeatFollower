@@ -1,0 +1,28 @@
+[figure="start"] .beat_wrapper {
+    width: 100%;
+    text-align: center;
+    animation: none !important;
+    cursor: default !important;
+}
+[figure="start"] .beat_wrapper h2 {
+    font-size: 8vmin;
+    margin: .5rem;
+    white-space: nowrap;
+}
+[figure="start"] .beat_wrapper div {
+    max-width: 100vh;
+    text-align: left;
+    left: 50%;
+    position: relative;
+    transform: translateX(-50%);
+}
+[figure="start"] .beat_wrapper p {
+    margin: 0;
+    font-size: 4vmin;
+}
+[figure="start"] .beat_wrapper p::before {
+    content: "➤";
+    font-size: .6em;
+    position: absolute;
+    left: -1.5em;
+}

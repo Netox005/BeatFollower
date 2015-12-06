@@ -1,0 +1,20 @@
+[figure="2"] .center-cube {
+    position: relative;
+    width: 40vmin;
+    height: 40vmin;
+    border: 3px solid transparent;
+    z-index: 1;
+}
+[figure="2"] .cube {
+    position: absolute;
+    width: 20vmin;
+    height: 20vmin;
+}
+[figure="2"] .cube.left { left: 0; }
+[figure="2"] .cube.right { right: 0; }
+[figure="2"] .cube.up { top: 0; }
+[figure="2"] .cube.down { bottom: 0; }
+[figure="2"] .cube.left.up { transform: translate(-50%,-50%); }
+[figure="2"] .cube.left.down { transform: translate(-50%,50%); }
+[figure="2"] .cube.right.up { transform: translate(50%,-50%); }
+[figure="2"] .cube.right.down { transform: translate(50%,50%); }
