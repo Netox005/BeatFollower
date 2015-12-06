@@ -1,5 +1,5 @@
 /*
-    Original by @moagrius (https://github.com/moagrius/Color)
+    Original by @moagrius (https://github.com/moagrius/Color) under MIT license
     Changes by @netux (https://github.com/netox005)
  */
 

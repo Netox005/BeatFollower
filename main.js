@@ -152,6 +152,11 @@ function doGeneralColoring() {
         if(modifiers[k].onColoring) modifiers[k].onColoring();
 }
 
+function changeDirections() {
+    lastDirection = lastDirection === 'normal' ? 'reverse' : 'normal';
+    beatWrapperEl.css('animation-direction', lastDirection);
+}
+
 function beatClick(e) {
     var isUp = e.button === 0;
     beatWrapperEl.children().clearQueue().finish();
@@ -177,9 +182,7 @@ function beatClick(e) {
             });
         }, 1);
 
-        if(modifiers['Q'].on || modifiers['W'].on || e.button === 1)
-            lastDirection = lastDirection === 'normal' ? 'reverse' : 'normal';
-        beatWrapperEl.css('animation-direction', lastDirection);
+        if(modifiers['Q'].on || modifiers['W'].on || e.button === 1) changeDirections();
     } else if(e.type === 'mouseup') {
         if(currentBeating.up) return;
         currentBeating.down = false;
@@ -208,9 +211,13 @@ function keyPress(e) {
     var keyCode = e.keyCode || e.which,
         key = String.fromCharCode(keyCode),
         isUp = e.type === 'keyup';
-    if(pressedKey[keyCode] && !isUp) return;
+    if(pressedKey[keyCode]) {
+        if(isUp) pressedKey[keyCode] = false;
+        return;
+    }
     pressedKey[keyCode] = !isUp;
     if(keyCode === 32) { // space
+        if(!isUp) changeDirections();
         beatClick({
             type: e.type.replace('key', 'mouse'),
             button: 0
@@ -285,28 +292,33 @@ function doParallax() {
 function render(index) {
     beatWrapperEl.children().remove();
     warningsEl.hide();
+    var styleSheet = beatEl.children('link');
     if(index <= 0) {
         beatEl.attr('figure', 'start');
         currentIndex = Number.NaN;
         current = figureStart;
-        beatEl.children('link').prop('href', './figures/start.css');
+        styleSheet.prop('href', './figures/start.css');
         warningsEl.show();
     } else if(index > figures.length) {
         beatEl.attr('figure', 'WIP');
         currentIndex = Number.NaN;
         current = figureWIP;
-        beatEl.children('link').prop('href', './figures/WIP.css');
+        styleSheet.prop('href', './figures/WIP.css');
     } else {
         beatEl.attr('figure', index);
         index--;
         currentIndex = index;
         current = figures[index];
 
-        beatEl.children('link').prop('href', './figures/' + (index + 1) + '.css');
+        styleSheet.prop('href', './figures/' + (index + 1) + '.css');
     }
     beatWrapperEl.prop('style', '');
-    beatWrapperEl.append(current.html);
-    doGeneralColoring();
+    var currentIndex1 = currentIndex;
+    styleSheet.load(function() {
+        if(currentIndex !== currentIndex1) return;
+        beatWrapperEl.append(current.html);
+        doGeneralColoring();
+    });
 }
 
 var halp = {
