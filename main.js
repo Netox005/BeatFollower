@@ -9,8 +9,8 @@ var figureStart = {
     html: [
         '<h2>Welcome to Beat Follower!</h2>',
         '<div>',
-            '<p>' + (!halp.isMobile() ? 'Left Click' : 'Touch <k>Right part of the Screen') + '</k> to <b>Beat Up</b></p>',
-            '<p>' + (!halp.isMobile() ? 'Right Click' : 'Touch Left part of the Screen') + '</k> to <b>Beat Down</b></p>',
+            '<p>' + (!halp.isMobile() ? '<k>Left Click' : 'Touch <k>Right part of the Screen') + '</k> to <b>Beat Up</b></p>',
+            '<p>' + (!halp.isMobile() ? '<k>Right Click' : 'Touch <k>Left part of the Screen') + '</k> to <b>Beat Down</b></p>',
             !halp.isMobile() ? '<p>Press keys <k>Q to R</k>, <k>A to F</k> and <k>Z to C</k> to use <b>Modifiers</b>.</p>' : '',
             '<p>' + (!halp.isMobile() ? 'Press keys <k>1 to 9</k>' : 'Swipe <k>Left</k> or <k>Right</k>' ) + ' to switch between <b title="This text itself is considered a Figure!">Figures</b></p>',
             '<p><i>Use this website with music in the background and beat to it!</i></p>',

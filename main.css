@@ -99,9 +99,9 @@ body {
     text-align: left;
     width: 395px;
 }
-
-#mouse-canvas {
-    position: fixed;
+.mobile #warnings > * {
+    font-size: 4vmin;
+    width: 40%;
 }
 
 @keyframes spin {
