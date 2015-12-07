@@ -3,6 +3,13 @@
     width: 40vmin;
     height: 40vmin;
     border: 3px solid transparent;
+}
+[figure="2"] .center-cube::after {
+    content: "";
+    position: absolute;
+    width: inherit;
+    height: inherit;
+    background-color: inherit;
     z-index: 1;
 }
 [figure="2"] .cube {

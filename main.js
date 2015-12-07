@@ -1,11 +1,18 @@
+var halp = {
+    dice: function(min, max) { return Math.floor(Math.random() * (max - min)) + min; },
+    randomBool: function() { return Math.random() >= .5; },
+    randColor: function() { return new Color('rgb(' + halp.dice(50, 250) + ', ' + halp.dice(50, 250) + ', ' + halp.dice(50, 250) + ')'); },
+    isMobile: function() { return /Mobile|iPhone|iPad|iPod|Android|Blackberry/i.test(navigator.userAgent);; }
+};
+
 var figureStart = {
     html: [
         '<h2>Welcome to Beat Follower!</h2>',
         '<div>',
-            '<p><k>Left Click</k> to <b>Beat Up</b></p>',
-            '<p><k>Right Click</k> to <b>Beat Down</b></p>',
-            '<p>Press keys <k>Q to R</k>, <k>A to F</k> and <k>Z to C</k> to use <b>Modifiers</b>.</p>',
-            '<p>Press keys <k>1 to 9</k> to switch between <b title="This text itself is considered a Figure!">Figures</b></p>',
+            '<p>' + (!halp.isMobile() ? 'Left Click' : 'Touch <k>Right part of the Screen') + '</k> to <b>Beat Up</b></p>',
+            '<p>' + (!halp.isMobile() ? 'Right Click' : 'Touch Left part of the Screen') + '</k> to <b>Beat Down</b></p>',
+            !halp.isMobile() ? '<p>Press keys <k>Q to R</k>, <k>A to F</k> and <k>Z to C</k> to use <b>Modifiers</b>.</p>' : '',
+            '<p>' + (!halp.isMobile() ? 'Press keys <k>1 to 9</k>' : 'Swipe <k>Left</k> or <k>Right</k>' ) + ' to switch between <b title="This text itself is considered a Figure!">Figures</b></p>',
             '<p><i>Use this website with music in the background and beat to it!</i></p>',
         '</div>',
     ].join('\n'),
@@ -20,11 +27,11 @@ var figureStart = {
     { // fig-1
         html: [
             '<div class="circle"></div>',
-            '<div class="line middle">',
-            '<div class="inner-line left up" style="visibility: hidden;"></div>',
-            '<div class="inner-line left down" style="visibility: hidden;"></div>',
-            '<div class="inner-line right up" style="visibility: hidden;"></div>',
-            '<div class="inner-line right down" style="visibility: hidden;"></div>',
+                '<div class="line middle">',
+                '<div class="inner-line left up" style="visibility: hidden;"></div>',
+                '<div class="inner-line left down" style="visibility: hidden;"></div>',
+                '<div class="inner-line right up" style="visibility: hidden;"></div>',
+                '<div class="inner-line right down" style="visibility: hidden;"></div>',
             '</div>',
         ].join('\n'),
         onColoring: function() {
@@ -39,11 +46,12 @@ var figureStart = {
     },
     { // fig-2
         html: [
-            '<div class="center-cube"></div>',
-            '<div class="cube left up"></div>',
-            '<div class="cube left down"></div>',
-            '<div class="cube right up"></div>',
-            '<div class="cube right down"></div>',
+            '<div class="center-cube">',
+                '<div class="cube left up"></div>',
+                '<div class="cube left down"></div>',
+                '<div class="cube right up"></div>',
+                '<div class="cube right down"></div>',
+            '</div>'
         ].join('\n'),
         onColoring: function() {
             beatWrapperEl.find('.center-cube').css('background-color', color.getHex());
@@ -71,7 +79,9 @@ var figureStart = {
         onColoring: function() {
             beatWrapperEl.find('.line').css('background-color', color.opposite().getHex());
             beatWrapperEl.find('.circles .circle').css('border-color', color.darker(.975).getHex());
-        }
+        },
+        onAfterBeatStart: function(isUp) { beatWrapperEl.find('.circles .circle').css('border-color', color.brighter(.9).getHex()); },
+        onAfterBeatEnd: function(isUp) { this.onColoring(); }
     },
     { // fig-4
         html: [
@@ -86,7 +96,9 @@ var figureStart = {
             triangle.css('border-bottom-color', color.brighter().getHex());
             triangle.children('.eye').css('background-color', color.getHex());
             triangle.children('.pupil').css('background-color', color.darker().getHex());
-        }
+        },
+        onAfterBeatStart: function(isUp) { if(isUp) beatWrapperEl.find('.pupil').css('background-color', 'rgba(255,0,0,.5)'); },
+        onBeforeBeatEnd: function(isUp) { this.onColoring(); }
     }
 ];
 var modifiers = {
@@ -141,7 +153,10 @@ var currentBeating = { up: false, down: false},
     lastMousePos = parallax,
     crazyParallaxInterval = undefined,
     crazyParallaxBool = false,
-    pressedKey = [ ];
+    pressedKey = [ ],
+    lastTouch = undefined,
+    lastMoveTouch = undefined,
+    minibeatTimeout = undefined;
 
 function doGeneralColoring() {
     color = halp.randColor();
@@ -157,50 +172,64 @@ function changeDirections() {
     beatWrapperEl.css('animation-direction', lastDirection);
 }
 
-function beatClick(e) {
-    var isUp = e.button === 0;
+function beat(beatUp, start, useMinibeat) {
     beatWrapperEl.children().clearQueue().finish();
-    if(e.type === 'mousedown') {
+    if(start) {
         if(currentBeating.down) return;
         doGeneralColoring();
+        if(minibeatTimeout) {
+            clearTimeout(minibeatTimeout);
+            minibeatTimeout = undefined;
+        }
         lastPressTimestamp = Date.now();
         currentBeating.up = false;
         currentBeating.down = true;
-        var duration = isUp ? 50 : 50;
-        if(current.onBeforeBeatStart) current.onBeforeBeatStart(isUp, duration);
+        var duration = 50;
+        if(current.onBeforeBeatStart) current.onBeforeBeatStart(beatUp, duration);
         for(var k in modifiers)
-            if(modifiers[k].onBeforeBeatStart) modifiers[k].onBeforeBeatStart(isUp, duration);
+            if(modifiers[k].onBeforeBeatStart) modifiers[k].onBeforeBeatStart(beatUp, duration);
         setTimeout(function() {
-            beatWrapperEl.children().animate({ zoom: isUp ? 1.25 : .75 }, {
+            beatWrapperEl.children().animate({ zoom: beatUp ? 1.25 : .75 }, {
                 duration: duration,
                 easing: 'linear',
                 complete: function() {
-                    if(current.onAfterBeatStart) current.onAfterBeatStart(isUp);
+                    if(current.onAfterBeatStart) current.onAfterBeatStart(beatUp);
                     for(var k in modifiers)
-                        if(modifiers[k].onAfterBeatStart) modifiers[k].onAfterBeatStart(isUp);
+                        if(modifiers[k].onAfterBeatStart) modifiers[k].onAfterBeatStart(beatUp);
                 }
             });
         }, 1);
 
-        if(modifiers['Q'].on || modifiers['W'].on || e.button === 1) changeDirections();
-    } else if(e.type === 'mouseup') {
+        if(modifiers['Q'].on || modifiers['W'].on) changeDirections();
+    } else {
         if(currentBeating.up) return;
         currentBeating.down = false;
         currentBeating.up = true;
-        var duration = isUp ? 100 : 50;
-        if(lastPressTimestamp + duration * 2 < Date.now())
-            duration = Math.min((Date.now() - lastPressTimestamp), 4000);
-        if(current.onBeforeBeatEnd) current.onBeforeBeatEnd(isUp, duration);
+        var duration = beatUp ? 100 : 50;
+        if(useMinibeat && lastPressTimestamp + duration > Date.now()) {
+            if(!minibeatTimeout) {
+                minibeatTimeout = setTimeout(function() {
+                    clearTimeout(minibeatTimeout);
+                    minibeatTimeout = undefined;
+                    currentBeating.up = !beatUp;    // don't ask me about these two
+                    currentBeating.down = !beatUp;  //     I don't know either
+                    beat(beatUp, false);
+                }, (lastPressTimestamp + duration) - Date.now() + 10);
+            }
+            return;
+        }
+        if(lastPressTimestamp + duration * 2 < Date.now()) duration = Math.min((Date.now() - lastPressTimestamp), 4000);
+        if(current.onBeforeBeatEnd) current.onBeforeBeatEnd(beatUp, duration);
         for(var k in modifiers)
-            if(modifiers[k].onBeforeBeatEnd) modifiers[k].onBeforeBeatEnd(isUp, duration);
+            if(modifiers[k].onBeforeBeatEnd) modifiers[k].onBeforeBeatEnd(beatUp, duration);
         setTimeout(function() {
             beatWrapperEl.children().animate({ zoom: 1 }, {
                 duration: duration,
                 easing: 'linear',
                 complete: function() {
-                    if(current.onAfterBeatEnd) current.onAfterBeatEnd(isUp);
+                    if(current.onAfterBeatEnd) current.onAfterBeatEnd(beatUp);
                     for(var k in modifiers)
-                        if(modifiers[k].onAfterBeatEnd) modifiers[k].onAfterBeatEnd(isUp);
+                        if(modifiers[k].onAfterBeatEnd) modifiers[k].onAfterBeatEnd(beatUp);
                 }
             });
         }, 1);
@@ -214,10 +243,7 @@ function keyPress(e) {
     pressedKey[keyCode] = !isUp
     if(keyCode === 32) { // space
         if(!isUp) changeDirections();
-        beatClick({
-            type: e.type.replace('key', 'mouse'),
-            button: 0
-        });
+        beat(true, !isUp);
         return;
     }
     var index = parseInt(key);
@@ -274,6 +300,7 @@ function onModifier(m) {
 }
 
 function doParallax() {
+    var lastPointerPos = halp.isMobile() ? lastMoveTouch : lastMousePos;
     beatWrapperEl.css('top', '');
     beatWrapperEl.css('left', '');
     if(!(modifiers['E'].on || modifiers['R'].on)) return;
@@ -294,25 +321,21 @@ function render(index) {
         styleSheetStr;
     if(index <= 0) {
         beatEl.attr('figure', 'start');
-        currentIndex = -1;
+        currentIndex = --index;
         current = figureStart;
         styleSheetStr = 'start';
-        //styleSheet.prop('href', './figures/start.css');
         warningsEl.show();
     } else if(index > figures.length) {
         beatEl.attr('figure', 'WIP');
-        currentIndex = -2;
+        currentIndex = figures.length;
         current = figureWIP;
         styleSheetStr = 'WIP';
-        //styleSheet.prop('href', './figures/WIP.css');
     } else {
         beatEl.attr('figure', index);
-        index--;
-        currentIndex = index;
+        currentIndex = --index;
         current = figures[index];
 
         styleSheetStr = index + 1;
-        //styleSheet.prop('href', './figures/' + (index + 1) + '.css');
     }
     beatWrapperEl.prop('style', '');
     var currentIndex1 = currentIndex;
@@ -324,13 +347,9 @@ function render(index) {
     });
 }
 
-var halp = {
-    dice: function(min, max) { return Math.floor(Math.random() * (max - min)) + min; },
-    randomBool: function() { return Math.random() >= .5; },
-    randColor: function() { return new Color('rgb(' + halp.dice(50, 250) + ', ' + halp.dice(50, 250) + ', ' + halp.dice(50, 250) + ')'); }
-}
-
 $(function() {
+    if(halp.isMobile()) $('body').addClass('mobile');
+
     beatEl = $('#beat');
     beatWrapperEl = beatEl.children('.beat_wrapper');
 
@@ -338,15 +357,46 @@ $(function() {
     beatWrapperEl.css('animation-play-state', 'running');
     beatWrapperEl.css('animation-direction', lastDirection);
 
-    $(document).on('mouseup', beatClick);
-    $(document).on('mousedown', beatClick);
-    $(document).on('contextmenu', function(e) { return false; });
-    $(document).on('keyup', keyPress);
-    $(document).on('keydown', keyPress);
-    $(document).on('mousemove', function(e) {
-        lastMousePos = { top: e.pageY, left: e.pageX};
-        doParallax();
-    });
+    if(halp.isMobile()) {
+        $(document).on('touchstart touchend', function(e) {
+            var start = e.type === 'touchstart';
+            if(start) {
+                e = e.originalEvent;
+                if(e.touches.length !== 1) return;
+                lastTouch = { top: e.touches[0].pageY, left: e.touches[0].pageX };
+                lastMoveTouch = lastTouch;
+            }
+            beat(lastTouch.left > window.innerWidth / 2, start, true);
+        });
+
+        $(document).on('touchmove', function(e) {
+            e = e.originalEvent;
+            if(e.touches.length !== 1) return;
+            lastMoveTouch = { top: e.touches[0].pageY, left: e.touches[0].pageX};
+            doParallax();
+        });
+
+        $(document).on('touchend', function(e) {
+            if(!lastMoveTouch) return;
+            var xDistance = lastMoveTouch.left - lastTouch.left;
+            if(Math.abs(xDistance) < window.innerWidth * .45) return; // 45% of total width
+            var index = currentIndex + 1;
+            render(xDistance < 0 ? ++index : --index);
+            lastTouch = lastMoveTouch;
+        });
+    } else {
+        $(document).on('mouseup mousedown', function(e) {
+            if(e.button === 1) changeDirections();
+            beat(e.button === 0, e.type === 'mousedown');
+        });
+        $(document).on('contextmenu', function(e) { return false; });
+
+        $(document).on('mousemove', function(e) {
+            lastMousePos = { top: e.pageY, left: e.pageX};
+            doParallax();
+        });
+        $(document).on('keyup keydown', keyPress);
+    }
 
     warningsEl = $('#warnings');
 

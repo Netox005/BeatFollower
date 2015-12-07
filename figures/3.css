@@ -9,6 +9,7 @@
 [figure="3"] .circles {
     width: 60vmin;
     height: 60vmin;
+    border-radius: 100%;
 }
 [figure="3"] .circles .circle {
     border: 1.5vmin solid;

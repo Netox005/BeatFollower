@@ -16,7 +16,7 @@
 }
 [figure="1"] .line {
     position: absolute;
-    width: calc(65vmin + 200px);
+    width: 100vmin;
     height: 10px;
 }
 [figure="1"] .inner-line {

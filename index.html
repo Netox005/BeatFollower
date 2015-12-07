@@ -2,6 +2,7 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
     <link rel="shortcut icon" type="image/png" href="./favicon.png"/>
     <title>Beat Follower</title>
     <link href="./main.css" rel="stylesheet" type="text/css">
@@ -11,19 +12,29 @@
     <script src="./main.js"></script>
 </head>
 <body class="no-select">
-    <div id="modifiers" style="visibility: hidden;">
-    </div>
-    <div id="beat">
-        <style class="beat_stylesheet"></style>
-        <div class="beat_wrapper middle"></div>
-    </div>
-    <div id="warnings">
-        <span class="health">
-            <b>MEDICAL WARNING:</b> This website contains flashing elements that could harm the user in certain conditions. Please proceed with precaution.
-        </span>
-        <span class="cpu-death">
-            <b>CPU WARNING:</b> This website has little to no optimization. Your computer may catch fire if you use it.
-        </span>
-    </div>
+    <section id="page">
+        <div id="modifiers" style="visibility: hidden;">
+        </div>
+        <div id="beat">
+            <style class="beat_stylesheet"></style>
+            <div class="beat_wrapper middle"></div>
+        </div>
+        <div id="warnings">
+            <span class="health">
+                <b>MEDICAL WARNING:</b> This website contains flashing elements that could harm the user in certain conditions. Please proceed with precaution.
+            </span>
+            <span class="cpu-death">
+                <b>CPU WARNING:</b> This website has little to no optimization. Your computer may catch fire if you use it.
+            </span>
+        </div>
+    </section>
+    <section id="if-portrait">
+        <div class="if-portrait_container middle">
+            <h2 class="title">Please turn your device horizontally!</h2>
+            <div>
+                <p>This website requires your device to be on landscape, that means rotated horizontally.</p>
+            </div>
+        </div>
+    </section>
 </body>
 </html>
