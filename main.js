@@ -101,6 +101,14 @@ var figureStart = {
         onBeforeBeatEnd: function(isUp) { this.onColoring(); }
     }
 ];
+var figureLoading = {
+    html: '<span class="text middle">Loading...</span>',
+    cachedStylesheet: [
+        '.beat_wrapper { width: 100%; text-align: center; cursor: default !important; animation: none !important; }',
+        '.beat_wrapper .text { font-size: 5vmin; font-weight: 700; font-family: "Verdana", Arial, sans-serif; white-space: nowrap; }',
+    ].join('\n'),
+    onColoring: function() { beatWrapperEl.children('.text').css('color', color.brighter().getHex()) }
+}
 var modifiers = {
     'Q': { toggle: true, disable: ['W'] },  /* Toggle Interval between directions */
     'W': { toggle: false, disable: ['Q'] }, /* Press Interval between directions */
@@ -149,7 +157,7 @@ var beatEl, beatWrapperEl, mouseCanvasEl, modifiersEl, warningsEl;
 var currentBeating = { up: false, down: false},
     lastPressTimestamp;
     lastDirection = 'normal',
-    parallax = { top: window.innerWidth / 2, left: window.innerHeight },
+    parallax = { top: window.innerWidth / 2, left: window.innerHeight / 2 },
     lastMousePos = parallax,
     crazyParallaxInterval = undefined,
     crazyParallaxBool = false,
@@ -338,13 +346,25 @@ function render(index) {
         styleSheetStr = index + 1;
     }
     beatWrapperEl.prop('style', '');
-    var currentIndex1 = currentIndex;
-    $.get('./figures/' + styleSheetStr + '.css', function(css) {
-        if(currentIndex !== currentIndex1) return;
-        styleSheet.text(css);
-        beatWrapperEl.append(current.html);
+    function set() {
+        styleSheet.text(current.cachedStylesheet);
+        beatWrapperEl.html(current.html);
         doGeneralColoring();
-    });
+    }
+    if(!current.cachedStylesheet) {
+        var currentIndex1 = currentIndex,
+            loadingTimeout = setTimeout(function() {
+                styleSheet.text(figureLoading.cachedStylesheet);
+                beatWrapperEl.html(figureLoading.html);
+                figureLoading.onColoring();
+            }, 250);
+        $.get('./figures/' + styleSheetStr + '.css', function(css) {
+            clearTimeout(loadingTimeout);
+            if(currentIndex !== currentIndex1) return;
+            current.cachedStylesheet = css;
+            set();
+        });
+    } else set();
 }
 
 $(function() {

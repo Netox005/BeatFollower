@@ -9,3 +9,4 @@
     font-family: "Verdana", Arial, sans-serif;
     white-space: nowrap;
 }
+.mobile [figure="WIP"] .beat_wrapper { animation: none !important; }
