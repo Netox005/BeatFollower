@@ -80,7 +80,7 @@ var figureStart = {
             beatWrapperEl.find('.line').css('background-color', color.opposite().getHex());
             beatWrapperEl.find('.circles .circle').css('border-color', color.darker(.975).getHex());
         },
-        onAfterBeatStart: function(isUp) { beatWrapperEl.find('.circles .circle').css('border-color', color.brighter(.9).getHex()); },
+        onBeforeBeatStart: function(isUp) { beatWrapperEl.find('.circles .circle').css('border-color', color.brighter(.9).getHex()); },
         onAfterBeatEnd: function(isUp) { this.onColoring(); }
     },
     { // fig-4
@@ -389,7 +389,6 @@ $(function() {
             if(e.button === 1) changeDirections();
             beat(e.button === 0, e.type === 'mousedown');
         });
-        $(document).on('contextmenu', function(e) { return false; });
 
         $(document).on('mousemove', function(e) {
             lastMousePos = { top: e.pageY, left: e.pageX};
@@ -397,6 +396,7 @@ $(function() {
         });
         $(document).on('keyup keydown', keyPress);
     }
+    $(document).on('contextmenu', function(e) { return false; });
 
     warningsEl = $('#warnings');
 
